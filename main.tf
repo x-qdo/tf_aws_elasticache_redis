@@ -4,7 +4,7 @@ data "aws_vpc" "vpc" {
 
 locals {
   vpc_name = replace(lookup(data.aws_vpc.vpc.tags, "Name", var.vpc_id), ".", "-")
-  parameter_group_family = substr(var.redis_version, 0,1) < 6 ?  "redis${replace(var.redis_version, "/\\.[\\d]+$/", "")}": "redis${replace(var.redis_version, "/\\.[\\d]+$/", "")}.x"
+  parameter_group_family = substr(var.redis_version, 0,1) < 6 || substr(var.redis_version, 0,1) >= 7 ? "redis${replace(var.redis_version, "/\\.[\\d]+$/", "")}": "redis${replace(var.redis_version, "/\\.[\\d]+$/", "")}.x"
 }
 
 resource "random_id" "salt" {
