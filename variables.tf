@@ -14,6 +14,23 @@ variable "alarm_actions" {
 }
 */
 
+variable "warning_database_usage_threshold" {
+  description = "The threshold for warning level database usage alarm"
+  type        = number
+  default     = 90
+}
+
+variable "critical_database_usage_threshold" {
+  description = "The threshold for critical level database usage alarm"
+  type        = number
+  default     = 96
+}
+
+variable "sns_topic_arn" {
+  type        = string
+  description = "The SNS topic ARN to notify."
+}
+
 variable "apply_immediately" {
   description = "Specifies whether any modifications are applied immediately, or during the next maintenance window. Default is false."
   type        = bool
