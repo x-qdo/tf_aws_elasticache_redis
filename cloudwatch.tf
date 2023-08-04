@@ -63,7 +63,7 @@ resource "aws_cloudwatch_metric_alarm" "redis-elasticache-high-db-memory-warning
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
 
-  dimensions {
+  dimensions = {
     CacheClusterId = "${aws_elasticache_replication_group.redis.id}-00${count.index + 1}"
   }
 }
@@ -85,7 +85,7 @@ resource "aws_cloudwatch_metric_alarm" "redis-elasticache-high-db-memory-critica
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
 
-  dimensions {
+  dimensions = {
     CacheClusterId = "${aws_elasticache_replication_group.redis.id}-00${count.index + 1}"
   }
 }
