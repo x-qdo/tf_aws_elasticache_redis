@@ -27,8 +27,15 @@ variable "critical_database_usage_threshold" {
 }
 
 variable "sns_topic_arn" {
-  type        = string
   description = "The SNS topic ARN to notify."
+  type        = string
+  default     = null
+}
+
+variable "alerts_enabled" {
+  description = "Determines if alert-related resources should be created. When set to true, `sns_topic_arn` must be provided. When false, associated alerting resources are skipped."
+  type        = bool
+  default     = false
 }
 
 variable "apply_immediately" {
