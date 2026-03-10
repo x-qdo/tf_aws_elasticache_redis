@@ -50,7 +50,7 @@ resource "aws_cloudwatch_metric_alarm" "redis-elasticache-high-db-memory-warning
   count = var.alerts_enabled == false ? 0 : var.redis_clusters
 
   alarm_name          = "Warning-${var.name}-${var.env}-CacheCluster00${count.index + 1}-DatabaseMemoryUsageHigh"
-  alarm_description   = "Warning: Redis memory usage is at or above ${var.warning_database_usage_threshold}%. Please check and consider resizing the instance"
+  alarm_description   = "Warning: ${var.engine} memory usage is at or above ${var.warning_database_usage_threshold}%. Please check and consider resizing the instance"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "DatabaseMemoryUsagePercentage"
@@ -58,10 +58,10 @@ resource "aws_cloudwatch_metric_alarm" "redis-elasticache-high-db-memory-warning
   period              = "300"
   statistic           = "Average"
 
-  threshold           = var.warning_database_usage_threshold
+  threshold = var.warning_database_usage_threshold
 
-  alarm_actions       = [var.sns_topic_arn]
-  ok_actions          = [var.sns_topic_arn]
+  alarm_actions = [var.sns_topic_arn]
+  ok_actions    = [var.sns_topic_arn]
 
   dimensions = {
     CacheClusterId = "${aws_elasticache_replication_group.redis.id}-00${count.index + 1}"
@@ -72,7 +72,7 @@ resource "aws_cloudwatch_metric_alarm" "redis-elasticache-high-db-memory-critica
   count = var.alerts_enabled == false ? 0 : var.redis_clusters
 
   alarm_name          = "Critical-${var.name}-${var.env}-CacheCluster00${count.index + 1}-DatabaseMemoryUsageHigh"
-  alarm_description   = "Critical: Redis memory usage is at or above ${var.critical_database_usage_threshold}%. Immediate action is required. Notify the developers and consider resizing the instance immediately."
+  alarm_description   = "Critical: ${var.engine} memory usage is at or above ${var.critical_database_usage_threshold}%. Immediate action is required. Notify the developers and consider resizing the instance immediately."
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "DatabaseMemoryUsagePercentage"
@@ -80,10 +80,10 @@ resource "aws_cloudwatch_metric_alarm" "redis-elasticache-high-db-memory-critica
   period              = "300"
   statistic           = "Average"
 
-  threshold           = var.critical_database_usage_threshold
+  threshold = var.critical_database_usage_threshold
 
-  alarm_actions       = [var.sns_topic_arn]
-  ok_actions          = [var.sns_topic_arn]
+  alarm_actions = [var.sns_topic_arn]
+  ok_actions    = [var.sns_topic_arn]
 
   dimensions = {
     CacheClusterId = "${aws_elasticache_replication_group.redis.id}-00${count.index + 1}"

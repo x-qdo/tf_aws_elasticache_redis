@@ -3,14 +3,18 @@ data "aws_vpc" "vpc" {
 }
 
 locals {
-  vpc_name               = replace(lookup(data.aws_vpc.vpc.tags, "Name", var.vpc_id), ".", "-")
-  parameter_group_family = substr(var.redis_version, 0, 1) < 6 || substr(var.redis_version, 0, 1) >= 7 ? "redis${replace(var.redis_version, "/\\.[\\d]+$/", "")}" : "redis${replace(var.redis_version, "/\\.[\\d]+$/", "")}.x"
+  vpc_name = replace(lookup(data.aws_vpc.vpc.tags, "Name", var.vpc_id), ".", "-")
+
+  # Redis 6.x uses family "redis6.x", all others use "{engine}{major}" (e.g. redis7, valkey7, valkey8)
+  engine_major           = split(".", var.engine_version)[0]
+  parameter_group_family = var.engine == "redis" && local.engine_major == "6" ? "redis6.x" : "${var.engine}${local.engine_major}"
 }
 
 resource "random_id" "salt" {
   byte_length = 8
   keepers = {
-    redis_version = var.redis_version
+    engine         = var.engine
+    engine_version = var.engine_version
   }
 }
 
@@ -23,12 +27,12 @@ resource "aws_elasticache_replication_group" "redis" {
   auto_minor_version_upgrade  = var.auto_minor_version_upgrade
   preferred_cache_cluster_azs = var.availability_zones
   multi_az_enabled            = var.multi_az_enabled
-  engine                      = "redis"
+  engine                      = var.engine
   at_rest_encryption_enabled  = var.at_rest_encryption_enabled
   kms_key_id                  = var.kms_key_id
   transit_encryption_enabled  = var.transit_encryption_enabled
   auth_token                  = var.transit_encryption_enabled ? var.auth_token : null
-  engine_version              = var.redis_version
+  engine_version              = var.engine_version
   port                        = var.redis_port
   parameter_group_name        = aws_elasticache_parameter_group.redis_parameter_group.id
   subnet_group_name           = aws_elasticache_subnet_group.redis_subnet_group.id
@@ -49,7 +53,6 @@ resource "aws_elasticache_parameter_group" "redis_parameter_group" {
 
   description = "Terraform-managed ElastiCache parameter group for ${var.name}-${var.env}-${local.vpc_name}"
 
-  # Strip the patch version from redis_version var
   family = local.parameter_group_family
   dynamic "parameter" {
     for_each = var.redis_parameters

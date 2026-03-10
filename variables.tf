@@ -97,11 +97,21 @@ variable "subnets" {
   description = "List of VPC Subnet IDs for the cache subnet group"
 }
 
-# might want a map
-variable "redis_version" {
-  description = "Redis version to use, defaults to 3.2.10"
+variable "engine" {
+  description = "Cache engine to use: redis or valkey"
   type        = string
-  default     = "3.2.10"
+  default     = "redis"
+
+  validation {
+    condition     = contains(["redis", "valkey"], var.engine)
+    error_message = "Engine must be 'redis' or 'valkey'."
+  }
+}
+
+variable "engine_version" {
+  description = "Version of the cache engine (e.g., 7.2)"
+  type        = string
+  default     = "7.2"
 }
 
 variable "vpc_id" {
