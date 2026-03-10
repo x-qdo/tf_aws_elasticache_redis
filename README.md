@@ -1,27 +1,33 @@
 # Breaking changes
 
+In version 4.0.0:
+- Added Valkey engine support (`engine` variable, accepts `redis` or `valkey`)
+- Replaced `redis_version` variable with `engine_version` (default changed from `3.2.10` to `7.2`)
+- Requires AWS provider `>= 6.0.0`
+- Requires Terraform `>= 1.0`
+
 In version 3.0.0, the module was reworked to operate with the 5.x.x version of the AWS provider.
 
-# A Terraform module to create a Redis ElastiCache cluster
+# A Terraform module to create a Redis/Valkey ElastiCache cluster
 
-A terraform module providing a Redis ElastiCache cluster in AWS.
+A Terraform module providing a Redis or Valkey ElastiCache cluster in AWS.
 
 This module
 
-- Creates Redis ElastiCache clusters
+- Creates Redis or Valkey ElastiCache clusters
 - Creates, manages, and exports a security group
 
 ## Terraform versions
 
-Terraform 0.12. Pin module version to `~> v2.0`. Submit pull-requests to `master` branch.
-
-Terraform 0.11. Pin module version to `~> v1.0`. Submit pull-requests to `terraform011` branch.
+Terraform >= 1.0. AWS provider >= 6.0.
 
 ## Usage
 
+### Redis
+
 ```hcl
 module "redis" {
-  source  = "github.com/terraform-community-modules/tf_aws_elasticache_redis.git?ref=v2.2.0"
+  source = "github.com/terraform-community-modules/tf_aws_elasticache_redis.git"
 
   env            = "dev"
   name           = "thtest"
@@ -29,17 +35,24 @@ module "redis" {
   redis_failover = "true"
   subnets        = ["subnet-12345678", "subnet-11111111", "subnet-22222222"]
   vpc_id         = "vpc-12345678"
+  engine_version = "7.2"
+}
+```
 
-  redis_parameters = [{
-    name  = "min-slaves-max-lag"
-    value = "5"
-  },{
-    name  = "min-slaves-to-write"
-    value = "1"
-  },{
-    name  = "databases"
-    value = "32"
-  }]
+### Valkey
+
+```hcl
+module "valkey" {
+  source = "github.com/terraform-community-modules/tf_aws_elasticache_redis.git"
+
+  env            = "dev"
+  name           = "thtest"
+  engine         = "valkey"
+  engine_version = "7.2"
+  redis_clusters = "2"
+  redis_failover = "true"
+  subnets        = ["subnet-12345678", "subnet-11111111", "subnet-22222222"]
+  vpc_id         = "vpc-12345678"
 }
 ```
 
